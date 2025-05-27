@@ -1,6 +1,7 @@
-# GraphRAG VLSI Assistant
+# AGENTE VLSI–OpenROAD Assistant
 
-A knowledge-based assistant that combines graph-based and retrieval-augmented generation (RAG) approaches to answer VLSI design automation questions. The system uses Neo4j for graph storage and Qdrant for vector storage, powered by OpenAI's language models.
+A knowledge-based assistant that combines retrieval-augmented generation (RAG) with OpenROAD's Python API.  
+Ask VLSI/OpenROAD questions, automatically run the generated Python in the OpenROAD binary, and get final answers—all in one end-to-end pipeline.
 
 ## Features
 
@@ -13,50 +14,56 @@ A knowledge-based assistant that combines graph-based and retrieval-augmented ge
 ## Prerequisites
 
 - Python 3.8+
-- OpenAI API key
-- Neo4j database access
-- Sufficient disk space for vector storage
+- OpenROAD CLI installed and on your `$PATH` (verify with `openroad -version`)
+- A running Neo4j instance (optional, for KG lookups)
+- Docker (optional, for building/running the Docker agent)
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd graphrag-vlsi
-```
+1. Clone this repo:
+   ```bash
+   git clone <repo-url>
+   cd graphrag-vlsi
+   ```
 
-2. Install required dependencies:
-```bash
-pip install python-dotenv camel-ai colorama neo4j qdrant-client
-```
+2. (Optional) Build & run the Docker-agent:
+   ```bash
+   docker build -t camel-agent .
+   docker run -it camel-agent
+   ```
 
-3. Create a `.env` file in the project root with your API keys:
-```env
-OPENAI_API_KEY=your_openai_api_key_here
-# Optional: Override default Neo4j credentials
-# NEO4J_URI=your_neo4j_uri
-# NEO4J_USERNAME=your_username
-# NEO4J_PASSWORD=your_password
-```
+3. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Create a `.env` file in the project root (this file is git-ignored):
+   ```ini
+   # OpenAI
+   OPENAI_API_KEY=sk-<your-key>
+   
+   # Neo4j (optional – skip if not using the KG)
+   NEO4J_URI=bolt://localhost:7687
+   NEO4J_USERNAME=neo4j
+   NEO4J_PASSWORD=secret
+   ```
 
 ## Project Structure
 
 ```
 graphrag-vlsi/
-├── main.py              # Main script
-├── flow_tutorial.md     # VLSI tutorial/documentation
-├── .env                 # Environment variables
-├── my_vectors/         # Vector storage directory
-└── README.md           # This file
+├── pipeline.py      # sets up embeddings, vector store, KG agent & ChatAgent
+├── executor.py      # CLI + helpers to extract/run code under openroad -python
+├── .env             # your environment variables
+└── README.md        # this file
 ```
 
 ## Usage
 
-1. Prepare your VLSI documentation:
-   - Place your VLSI tutorial or documentation in `flow_tutorial.md`
-   - The file should contain relevant information about VLSI design flows, techniques, and best practices
+### 1) One-shot CLI
 
-2. Run the assistant:
+Ask a question, get a response, and run the code in OpenROAD.
+
 ```bash
 python main.py
 ```
@@ -108,7 +115,7 @@ Feel free to submit issues and enhancement requests!
 
 ## License
 
-[Your chosen license]
+BSD 2-Clause "Simplified" License
 
 ## Acknowledgments
 
